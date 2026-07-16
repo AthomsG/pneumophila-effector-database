@@ -34,6 +34,19 @@ def test_exact_sequence_deduplication():
     assert sequence_hash("MPEP")
 
 
+def test_pathogens3d_accession_correction(monkeypatch, tmp_path):
+    curation = tmp_path / "curation"
+    curation.mkdir()
+    (curation / "source_accession_corrections.tsv").write_text(
+        "source_accession\treplacement_accession\tlocus_tag\treason\treference\n"
+        "OLD\tNEW\tlpg1\tobsolete\thttps://example.test\n"
+    )
+    monkeypatch.setattr(pipeline, "CURATION", curation)
+    mapped = pipeline._pathogens3d_by_accession([{"Uniprot": "OLD", "Locus name": "lpg1"}])
+    assert set(mapped) == {"NEW"}
+    assert mapped["NEW"]["source_uniprot_accession"] == "OLD"
+
+
 def test_build_from_local_fixtures(monkeypatch, tmp_path):
     data, raw, reports, curation = tmp_path / "data", tmp_path / "data/raw", tmp_path / "reports", tmp_path / "curation"
     raw.mkdir(parents=True)
@@ -51,6 +64,7 @@ def test_build_from_local_fixtures(monkeypatch, tmp_path):
     monkeypatch.setattr(pipeline, "CURATION", curation)
     rows = pipeline.build()
     assert [r["uniprot_accession"] for r in rows] == ["P00001"]
+    assert rows[0]["evidence_category"] == "experimentally_supported"
     assert read_tsv(reports / "source_comparison.tsv")[0]["comparison_status"] == "overlap"
     assert (data / "all_effector_sequences.faa").read_text().startswith(">P00001")
     assert "gene=testA" in (data / "all_effector_sequences.faa").read_text().splitlines()[0]

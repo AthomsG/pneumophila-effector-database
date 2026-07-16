@@ -1,10 +1,10 @@
-# Catalogue quality audit
+# Initial high-recall catalogue quality audit
 
-Audit date: 2026-07-16. This assessment examines the 1,303 records currently emitted by the pipeline and the raw records that caused their inclusion.
+Audit date: 2026-07-16. This assessment documents the initial 1,303-record high-recall design and the evidence that motivated replacing it with an established-only reference catalogue. Counts below describe that historical output, not the current master file.
 
 ## Verdict
 
-The current master file is **not yet a defensible list of all known *Legionella* effectors**. It is a useful high-recall discovery set containing three different things:
+The initial master file was **not a defensible list of all known *Legionella* effectors**. It was a useful high-recall discovery set containing three different things:
 
 1. a strong *L. pneumophila* reference set derived from reported Dot/Icm-dependent translocation screens;
 2. automatically annotated or inferred effector homologues from 65 taxa;
@@ -77,4 +77,3 @@ UniProt alone is therefore insufficient for a high-recall known-effector catalog
 6. Preserve all broad-query hits only in ignored diagnostics so search sensitivity can still be audited without presenting those hits as biological truth.
 
 The most defensible immediate main product is therefore a corrected, provenance-rich *L. pneumophila* reference repertoire. A genus-wide “all known *Legionella* effectors” file requires an explicit policy for whether strain homologues count as separate known effectors and what level of translocation evidence is required.
-

@@ -1,2 +1,1 @@
-uniprot_accession	canonical_name	gene_names	locus_tag	organism	strain	taxonomy_id	reviewed	protein_name	annotation	sequence	sequence_length	evidence_category	source	source_record	retrieval_date
-
+uniprot_accession	canonical_name	gene_names	locus_tag	organism	strain	taxonomy_id	reviewed	protein_name	annotation	sequence	sequence_length	evidence_category	evidence_note	evidence_reference	source	source_record	retrieval_date

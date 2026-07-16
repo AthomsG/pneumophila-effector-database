@@ -2,27 +2,24 @@
 
 [![Refresh catalogue](https://github.com/AthomsG/pneumophila-effector-database/actions/workflows/refresh.yml/badge.svg)](https://github.com/AthomsG/pneumophila-effector-database/actions/workflows/refresh.yml)
 
-A compact, refreshable catalogue of known and candidate *Legionella* Dot/Icm effectors. The repository deliberately separates source retrieval from evidence interpretation: matching a broad text query does not establish experimental validation.
-
-> [!WARNING]
-> The current high-recall output still mixes experimentally translocated effectors, automatically inferred homologues, and identifiable false positives. See the [catalogue quality audit](reports/catalogue_quality_audit.md) before using it as a known-effector reference set.
+A compact, refreshable reference catalogue of established *Legionella pneumophila* Dot/Icm effectors. The primary FASTA contains proteins backed by reported Dot/Icm-dependent translocation evaluations; broad text matches and embedding-neighborhood candidates are not added automatically.
 
 ## Sources and selection
 
-UniProtKB is the primary source for accessions, sequences, names, taxonomy, review status, comments, cross-references, publications, and protein-existence evidence. The fetch step tests four search strategies: protein names containing “effector”, free-text “Dot/Icm”, free-text “type IV secretion”, and a growing list of established names such as RavZ, SidM/DrrA, SidC, AnkB, LegK2, LubX, SidH, and SidD.
+Pathogens3D is the evidence-bearing seed source. Its 368-protein repertoire was assembled from previously reported genome-wide evaluations of Dot/Icm-dependent translocation. UniProtKB supplies current accessions, sequences, names, taxonomy, review status, comments, cross-references, and publications.
 
-[Pathogens3D](https://proteins.pathogens3d.org/data/data.legionella-effectors.tsv) is retained as a secondary discovery/evidence source. Its accessions are resolved through UniProt; its concise annotations and domain architectures remain useful for source assessment. The measured source overlap and current rationale are in [reports/source_assessment.md](reports/source_assessment.md).
+[Pathogens3D](https://proteins.pathogens3d.org/data/data.legionella-effectors.tsv) accessions are validated and resolved through UniProt. Known incorrect or obsolete source mappings are repaired in `curation/source_accession_corrections.tsv`, while the original source accession remains in provenance. Its concise annotations and domain architectures are retained in the catalogue.
 
-Broad query results include Dot/Icm apparatus components and automatically named homologues. The builder retains records with explicit effector wording, explicit Dot/Icm-substrate wording, a known effector gene name, or a Pathogens3D accession. It does not treat every query hit as a catalogue member.
+The fetch step still measures broad UniProt searches for “effector,” “Dot/Icm,” “type IV secretion,” and known names. These searches are useful for literature follow-up and source assessment, but their results include apparatus proteins, other secretion systems, housekeeping name collisions, and automatically inferred homologues. They do not enter the established reference automatically. See the [initial catalogue audit](reports/catalogue_quality_audit.md) and [embedding-cluster assessment](reports/embedding_cluster_assessment.md).
 
 ## Evidence categories
 
-- `experimentally_supported`: explicitly asserted through a manual addition with a supporting reference.
+- `experimentally_supported`: reported Dot/Icm-dependent translocation evidence with a supporting source. This does not imply that molecular function has been experimentally determined.
 - `curated_annotation`: a reviewed UniProtKB/Swiss-Prot effector annotation.
 - `automated_annotation`: an unreviewed UniProtKB/TrEMBL annotation or homology-based name.
 - `ambiguous_candidate`: deliberately retained despite uncertainty.
 
-These categories are conservative. “Reviewed” means expert-curated, not necessarily that translocation or function was directly demonstrated for every strain-specific record. Pathogens3D membership alone is not upgraded to experimental support.
+The established output uses `experimentally_supported`. Other categories remain available for diagnostics and future candidate outputs, but automated or ambiguous records are excluded from the primary FASTA. “Reviewed” means expert-curated and is separate from translocation evidence.
 
 ## Running the pipeline
 
@@ -45,7 +42,7 @@ The `data/` directory contains only the two primary deliverables: `master_effect
 
 ## Manual additions and exclusions
 
-Add a row to `curation/manual_additions.tsv` using the master-table columns. Supply a stable accession when one exists, a sequence where possible, a provenance string in `source_record`, and do not use `experimentally_supported` without a literature reference in the provenance. Exact sequence hashes and UniProt accessions are used for deduplication; aliases and source provenance are merged.
+Add a row to `curation/manual_additions.tsv` using the master-table columns. A primary-reference addition must include a stable accession, sequence where possible, `experimentally_supported`, a precise explanation in `evidence_note`, and a DOI/PMID or publication URL in `evidence_reference`. Exact sequence hashes and UniProt accessions are used for deduplication; aliases and source provenance are merged.
 
 To suppress a record, add its accession (preferred) or canonical name to `curation/manual_exclusions.tsv`, plus a reason and reference. Manual files are intentionally small and reviewable.
 
@@ -55,4 +52,4 @@ The GitHub Actions workflow runs on the first day of each month and by manual di
 
 ## Limitations
 
-Text search is sensitive to annotation wording and can miss effectors described only as “uncharacterized protein.” Conversely, secretion-system queries retrieve machinery proteins that are not effectors. Gene names are reused across strains, automated annotations propagate by homology, and Pathogens3D is centred on structurally interpreted records rather than exhaustive strain coverage. The catalogue is therefore a transparent, reproducible starting point—not a claim of complete or uniformly experimental coverage.
+The reference is centred on the reported *L. pneumophila* translocation repertoire and is not an exhaustive catalogue of inferred effector homologues across every *Legionella* species. Experimental support refers to secretion/translocation, not necessarily biochemical function. New literature-supported effectors require manual review before inclusion. For machine-learning use, homologous sequences should be clustered before train/test splitting to prevent leakage; embedding proximity or automated product names must not be treated as ground-truth positives.

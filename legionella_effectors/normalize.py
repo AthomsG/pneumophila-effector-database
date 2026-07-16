@@ -64,6 +64,8 @@ def normalize_uniprot(record, retrieval_date):
         "sequence": sequence,
         "sequence_length": record.get("sequence", {}).get("length", len(sequence)),
         "evidence_category": "curated_annotation" if record.get("entryType", "").startswith("UniProtKB reviewed") else "automated_annotation",
+        "evidence_note": "",
+        "evidence_reference": "",
         "source": "UniProt",
         "source_record": record.get("primaryAccession", ""),
         "retrieval_date": retrieval_date,

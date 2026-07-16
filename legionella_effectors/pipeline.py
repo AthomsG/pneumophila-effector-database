@@ -13,10 +13,36 @@ COMPARISON_FIELDS = (
     "included_in_master", "uniprot_query_names", "pathogens3d_gene", "pathogens3d_locus",
     "pathogens3d_annotation", "comparison_status",
 )
+PATHOGENS3D_EVIDENCE = (
+    "Included in the Pathogens3D compilation of proteins identified by previously "
+    "reported genome-wide Dot/Icm-dependent translocation evaluations"
+)
+PATHOGENS3D_REFERENCE = "https://doi.org/10.1038/s44320-024-00076-z"
 
 
 def today():
     return dt.datetime.now(dt.timezone.utc).date().isoformat()
+
+
+def _corrections():
+    return {
+        row["source_accession"]: row["replacement_accession"]
+        for row in read_tsv(CURATION / "source_accession_corrections.tsv")
+        if row.get("source_accession") and row.get("replacement_accession")
+    }
+
+
+def _pathogens3d_by_accession(rows):
+    corrections = _corrections()
+    result = {}
+    for row in rows:
+        original = row.get("Uniprot", "").strip()
+        if not original:
+            continue
+        corrected = dict(row)
+        corrected["source_uniprot_accession"] = original
+        result[corrections.get(original, original)] = corrected
+    return result
 
 
 def fetch():
@@ -35,7 +61,7 @@ def fetch():
         failures.append({"source": "Pathogens3D", "record": "Legionella table", "operation": "download", "error": str(exc), "retrieval_date": date})
         p3d = []
 
-    accessions = {row.get("Uniprot", "").strip() for row in p3d}
+    accessions = set(_pathogens3d_by_accession(p3d))
     try:
         accession_records = fetch_uniprot_accessions(accessions)
         dump_json(RAW / "uniprot_pathogens3d_accessions.json", accession_records)
@@ -103,7 +129,7 @@ def _merge_rows(rows):
 def build():
     query_sets, accession_records, p3d = load_sources()
     date = today()
-    p3d_by_accession = {r.get("Uniprot", "").strip(): r for r in p3d if r.get("Uniprot", "").strip()}
+    p3d_by_accession = _pathogens3d_by_accession(p3d)
     records = {}
     from_query = set()
     for values in query_sets.values():
@@ -116,7 +142,7 @@ def build():
         records[record.get("primaryAccession", "")] = record
 
     rows = []
-    for accession in sorted(from_query | set(p3d_by_accession)):
+    for accession in sorted(p3d_by_accession):
         record = records.get(accession)
         if not record:
             continue
@@ -124,7 +150,11 @@ def build():
         if accession in p3d_by_accession:
             p = p3d_by_accession[accession]
             row["source"] = "UniProt;Pathogens3D"
-            row["source_record"] = f"{accession};Pathogens3D:{p.get('Locus name') or p.get('Gene name') or accession}"
+            source_accession = p.get("source_uniprot_accession", accession)
+            row["source_record"] = (
+                f"{accession};Pathogens3D:{p.get('Locus name') or p.get('Gene name') or source_accession}"
+                + (f";Pathogens3D_accession:{source_accession}" if source_accession != accession else "")
+            )
             p_alias = p.get("Gene name", "").strip()
             if p_alias:
                 aliases = [*row["gene_names"].split(";"), *p_alias.replace("/", ";").split(";")]
@@ -134,10 +164,9 @@ def build():
                 row["annotation"] = " | ".join(dict.fromkeys(
                     x for x in (row["annotation"], f"Pathogens3D: {p_annotation}") if x
                 ))
-            if accession not in from_query and not _is_effector(record):
-                row["evidence_category"] = "ambiguous_candidate"
-            if record.get("entryType") == "Inactive":
-                row["source"] = "Pathogens3D"
+            row["evidence_category"] = "experimentally_supported"
+            row["evidence_note"] = PATHOGENS3D_EVIDENCE
+            row["evidence_reference"] = PATHOGENS3D_REFERENCE
         rows.append(row)
 
     rows.extend(read_tsv(CURATION / "manual_additions.tsv"))
@@ -166,6 +195,7 @@ def _write_fasta(rows):
             ("locus", row["locus_tag"]), ("protein_name", row["protein_name"]),
             ("organism", row["organism"]), ("taxid", row["taxonomy_id"]),
             ("reviewed", row["reviewed"]), ("evidence", row["evidence_category"]),
+            ("evidence_reference", row.get("evidence_reference", "")),
             ("source", row["source"]), ("annotation", row.get("annotation", "")),
         )
         lines.append(f">{header} " + " | ".join(f"{key}={clean(value)}" for key, value in metadata))
@@ -183,7 +213,7 @@ def compare(master=None):
             accession = record.get("primaryAccession", "")
             query_records[accession] = record
             query_names[accession].append(name)
-    p3d_by = {r.get("Uniprot", "").strip(): r for r in p3d if r.get("Uniprot", "").strip()}
+    p3d_by = _pathogens3d_by_accession(p3d)
     master_by = {r.get("uniprot_accession", ""): r for r in master}
     all_accessions = sorted(set(query_records) | set(p3d_by))
     rows = []
@@ -211,7 +241,7 @@ def compare(master=None):
 
 def _write_report(query_sets, p3d, accession_records, comparison, master):
     counts = Counter(r["comparison_status"] for r in comparison)
-    p3d_accessions = {r.get("Uniprot", "").strip() for r in p3d if r.get("Uniprot", "").strip()}
+    p3d_accessions = set(_pathogens3d_by_accession(p3d))
     resolved = {r.get("primaryAccession", "") for r in accession_records if r.get("entryType") != "Inactive"}
     inactive = {r.get("primaryAccession", "") for r in accession_records if r.get("entryType") == "Inactive"}
     missing = [r for r in comparison if r["comparison_status"] == "pathogens3d_only"]
@@ -219,7 +249,7 @@ def _write_report(query_sets, p3d, accession_records, comparison, master):
     query_only_rejected = [r for r in comparison if r["comparison_status"] == "uniprot_query_only" and r["included_in_master"] == "false"]
     def preview(rows, limit=30):
         values = ", ".join(f"`{r['uniprot_accession']}`" for r in rows[:limit]) or "none"
-        return values + (f", … ({len(rows) - limit} more; see `reports/source_comparison.tsv`)" if len(rows) > limit else "")
+        return values + (f", … ({len(rows) - limit} more in the locally generated comparison TSV)" if len(rows) > limit else "")
 
     lines = [
         "# Source assessment", "", f"Data retrieved on {today()}.", "", "## Queries tested", "",
@@ -234,7 +264,7 @@ def _write_report(query_sets, p3d, accession_records, comparison, master):
         f"Across the exploratory queries, **{counts['overlap']}** accessions overlap Pathogens3D, "
         f"**{counts['pathogens3d_only']}** Pathogens3D accessions are not recovered by those queries, and "
         f"**{counts['uniprot_query_only']}** UniProt query hits are absent from Pathogens3D.",
-        "", "The complete, row-level result (including query provenance) is in `reports/source_comparison.tsv`.",
+        "", "The complete row-level comparison, including query provenance, is generated locally as `reports/source_comparison.tsv` and intentionally ignored by Git.",
         "", "## Missing and additional records", "",
         f"Pathogens3D-only accessions ({len(missing)}): " + preview(missing) + ".",
         "",
@@ -245,15 +275,14 @@ def _write_report(query_sets, p3d, accession_records, comparison, master):
         "Prominent false positives are structural Dot/Icm/type-IV secretion apparatus proteins; text mentioning a secretion system is not evidence that the protein is a translocated effector. "
         "Other unreviewed records are plausible homologues but only automatically annotated, so their evidence category must not be upgraded merely because a query matched.",
         "", "## Source decision", "",
-        f"The master catalogue currently contains **{len(master)}** records. UniProt remains the sequence, taxonomy, identifier, review-status, cross-reference, publication, and evidence backbone. "
-        "Pathogens3D remains a secondary source because it recovers query-missed accessions and contributes concise functional notes and domain architecture that are not consistently represented as equivalent UniProt fields. "
-        "Its accessions are resolved back through UniProt so sequences and current identifiers still come from the primary service.",
+        f"The established master catalogue currently contains **{len(master)}** records. Pathogens3D is the evidence-bearing seed because its repertoire was compiled from reported Dot/Icm-dependent translocation evaluations. "
+        "UniProt supplies current sequences, taxonomy, identifiers, review status, comments, cross-references, and publications. Broad UniProt text-query hits remain discovery candidates and are not added automatically.",
         "", "## Useful UniProt fields inspected", "",
         "The JSON responses expose `primaryAccession`, `entryType`, `proteinDescription`, `genes` (including ordered locus names/ORF names), `organism` and `taxonId`, `sequence` and length, `comments`, `uniProtKBCrossReferences`, `references`, and `proteinExistence`. "
         "The builder uses the stable tabular subset in the master file and retains raw JSON snapshots for deeper inspection.",
         "", "## Evidence interpretation", "",
-        "Reviewed UniProt entries are labelled `curated_annotation`; unreviewed entries are `automated_annotation`. `experimentally_supported` is reserved for an explicit manual assertion backed by literature, and `ambiguous_candidate` is available for deliberately included uncertain records. "
-        "Neither a Pathogens3D row nor an automatic effector name alone is treated as experimental validation.", "",
+        "The established reference uses `experimentally_supported` for the Pathogens3D repertoire because its source study compiled proteins from reported genome-wide Dot/Icm-dependent translocation evaluations. This describes translocation evidence, not necessarily a known molecular function. "
+        "Automatic UniProt query hits are excluded from the primary catalogue.", "",
     ]
     REPORTS.mkdir(parents=True, exist_ok=True)
     (REPORTS / "source_assessment.md").write_text("\n".join(lines), encoding="utf-8")

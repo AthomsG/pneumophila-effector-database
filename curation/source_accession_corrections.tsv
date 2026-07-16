@@ -1,0 +1,3 @@
+source_accession	replacement_accession	locus_tag	reason	reference
+A0A077GS41	Q5ZS91	lpg2628	Pathogens3D accession is inactive; replacement matches the Philadelphia 1 locus and length	https://rest.uniprot.org/uniprotkb/Q5ZS91
+A0A3N9YH02	Q5ZST2	lpg2434	Pathogens3D accession belongs to Aeromonas caviae; replacement matches the Philadelphia 1 locus	https://rest.uniprot.org/uniprotkb/Q5ZST2
