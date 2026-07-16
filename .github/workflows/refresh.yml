@@ -70,5 +70,4 @@ jobs:
           add-paths: |
             data/master_effectors.tsv
             data/all_effector_sequences.faa
-            reports/source_comparison.tsv
             reports/source_assessment.md

@@ -4,6 +4,9 @@
 
 A compact, refreshable catalogue of known and candidate *Legionella* Dot/Icm effectors. The repository deliberately separates source retrieval from evidence interpretation: matching a broad text query does not establish experimental validation.
 
+> [!WARNING]
+> The current high-recall output still mixes experimentally translocated effectors, automatically inferred homologues, and identifiable false positives. See the [catalogue quality audit](reports/catalogue_quality_audit.md) before using it as a known-effector reference set.
+
 ## Sources and selection
 
 UniProtKB is the primary source for accessions, sequences, names, taxonomy, review status, comments, cross-references, publications, and protein-existence evidence. The fetch step tests four search strategies: protein names containing “effector”, free-text “Dot/Icm”, free-text “type IV secretion”, and a growing list of established names such as RavZ, SidM/DrrA, SidC, AnkB, LegK2, LubX, SidH, and SidD.
