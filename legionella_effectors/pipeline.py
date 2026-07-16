@@ -2,7 +2,7 @@ import csv
 import datetime as dt
 from collections import Counter, defaultdict
 
-from .config import DATA, KNOWN_NAMES, MASTER_FIELDS, QUERIES, RAW, REPORTS
+from .config import CURATION, DATA, KNOWN_NAMES, MASTER_FIELDS, QUERIES, RAW, REPORTS
 from .io_utils import dump_json, load_json, read_tsv, sequence_hash, write_tsv
 from .normalize import normalize_uniprot, record_text
 from .sources import fetch_pathogens3d, fetch_uniprot, fetch_uniprot_accessions
@@ -49,7 +49,10 @@ def fetch():
                 })
     except Exception as exc:
         failures.append({"source": "UniProt", "record": "Pathogens3D accessions", "operation": "lookup", "error": str(exc), "retrieval_date": date})
-    write_tsv(DATA / "fetch_failures.tsv", failures, FAILURE_FIELDS)
+    write_tsv(RAW / "fetch_failures.tsv", failures, FAILURE_FIELDS)
+    fatal = [failure for failure in failures if failure["operation"] != "resolve Pathogens3D accession"]
+    if fatal:
+        raise RuntimeError(f"{len(fatal)} source retrieval operation(s) failed; see data/raw/fetch_failures.tsv")
     return failures
 
 
@@ -126,14 +129,19 @@ def build():
             if p_alias:
                 aliases = [*row["gene_names"].split(";"), *p_alias.replace("/", ";").split(";")]
                 row["gene_names"] = ";".join(dict.fromkeys(x for x in aliases if x))
+            p_annotation = " ".join(p.get("Annotation", "").split())
+            if p_annotation:
+                row["annotation"] = " | ".join(dict.fromkeys(
+                    x for x in (row["annotation"], f"Pathogens3D: {p_annotation}") if x
+                ))
             if accession not in from_query and not _is_effector(record):
                 row["evidence_category"] = "ambiguous_candidate"
             if record.get("entryType") == "Inactive":
                 row["source"] = "Pathogens3D"
         rows.append(row)
 
-    rows.extend(read_tsv(DATA / "manual_additions.tsv"))
-    exclusions = read_tsv(DATA / "manual_exclusions.tsv")
+    rows.extend(read_tsv(CURATION / "manual_additions.tsv"))
+    exclusions = read_tsv(CURATION / "manual_exclusions.tsv")
     excluded_accessions = {r.get("uniprot_accession", "") for r in exclusions}
     excluded_names = {r.get("canonical_name", "").lower() for r in exclusions if r.get("canonical_name")}
     rows = [r for r in rows if r.get("uniprot_accession", "") not in excluded_accessions and r.get("canonical_name", "").lower() not in excluded_names]
@@ -145,12 +153,22 @@ def build():
 
 
 def _write_fasta(rows):
+    def clean(value):
+        return " ".join(str(value or "").replace("|", "/").split()) or "-"
+
     lines = []
     for row in rows:
         if not row["sequence"]:
             continue
         header = row["uniprot_accession"] or sequence_hash(row["sequence"])[:12]
-        lines.append(f">{header} {row['canonical_name']} | {row['organism']}")
+        metadata = (
+            ("name", row["canonical_name"]), ("gene", row["gene_names"]),
+            ("locus", row["locus_tag"]), ("protein_name", row["protein_name"]),
+            ("organism", row["organism"]), ("taxid", row["taxonomy_id"]),
+            ("reviewed", row["reviewed"]), ("evidence", row["evidence_category"]),
+            ("source", row["source"]), ("annotation", row.get("annotation", "")),
+        )
+        lines.append(f">{header} " + " | ".join(f"{key}={clean(value)}" for key, value in metadata))
         lines.extend(row["sequence"][i:i + 60] for i in range(0, len(row["sequence"]), 60))
     (DATA / "all_effector_sequences.faa").write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
 
@@ -186,7 +204,7 @@ def compare(master=None):
             "pathogens3d_annotation": p.get("Annotation", ""),
             "comparison_status": status,
         })
-    write_tsv(DATA / "source_comparison.tsv", rows, COMPARISON_FIELDS)
+    write_tsv(REPORTS / "source_comparison.tsv", rows, COMPARISON_FIELDS)
     _write_report(query_sets, p3d, accession_records, rows, master)
     return rows
 
@@ -201,7 +219,7 @@ def _write_report(query_sets, p3d, accession_records, comparison, master):
     query_only_rejected = [r for r in comparison if r["comparison_status"] == "uniprot_query_only" and r["included_in_master"] == "false"]
     def preview(rows, limit=30):
         values = ", ".join(f"`{r['uniprot_accession']}`" for r in rows[:limit]) or "none"
-        return values + (f", … ({len(rows) - limit} more; see `data/source_comparison.tsv`)" if len(rows) > limit else "")
+        return values + (f", … ({len(rows) - limit} more; see `reports/source_comparison.tsv`)" if len(rows) > limit else "")
 
     lines = [
         "# Source assessment", "", f"Data retrieved on {today()}.", "", "## Queries tested", "",
@@ -211,12 +229,12 @@ def _write_report(query_sets, p3d, accession_records, comparison, master):
     lines += [
         "", "## Coverage and overlap", "",
         f"Pathogens3D contains **{len(p3d)}** rows and **{len(p3d_accessions)}** non-empty UniProt accessions. "
-        f"UniProt resolved **{len(resolved & p3d_accessions)}** to active records; **{len(inactive)}** accession(s) are inactive/deleted and appear in `data/fetch_failures.tsv`.",
+        f"UniProt resolved **{len(resolved & p3d_accessions)}** to active records; **{len(inactive)}** accession(s) are inactive/deleted and are noted in the transient fetch log.",
         "",
         f"Across the exploratory queries, **{counts['overlap']}** accessions overlap Pathogens3D, "
         f"**{counts['pathogens3d_only']}** Pathogens3D accessions are not recovered by those queries, and "
         f"**{counts['uniprot_query_only']}** UniProt query hits are absent from Pathogens3D.",
-        "", "The complete, row-level result (including query provenance) is in `data/source_comparison.tsv`.",
+        "", "The complete, row-level result (including query provenance) is in `reports/source_comparison.tsv`.",
         "", "## Missing and additional records", "",
         f"Pathogens3D-only accessions ({len(missing)}): " + preview(missing) + ".",
         "",

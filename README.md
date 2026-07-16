@@ -1,5 +1,7 @@
 # Legionella effector catalogue
 
+[![Refresh catalogue](https://github.com/AthomsG/pneumophila-effector-database/actions/workflows/refresh.yml/badge.svg)](https://github.com/AthomsG/pneumophila-effector-database/actions/workflows/refresh.yml)
+
 A compact, refreshable catalogue of known and candidate *Legionella* Dot/Icm effectors. The repository deliberately separates source retrieval from evidence interpretation: matching a broad text query does not establish experimental validation.
 
 ## Sources and selection
@@ -30,19 +32,19 @@ uv run python -m legionella_effectors build
 uv run python -m legionella_effectors all
 ```
 
-`fetch` writes raw source snapshots and records recoverable failures in `data/fetch_failures.tsv`. `compare` produces the row-level source comparison and report. `build` creates the master TSV and FASTA from already-fetched snapshots. `all` runs retrieval and the complete rebuild. Tests use only local fixtures:
+`fetch` writes ignored raw source snapshots and a transient failure log under `data/raw/`. A genuine retrieval failure exits non-zero, making the Actions badge red; an obsolete source accession is recorded but does not abort an otherwise valid refresh. `compare` produces the row-level source comparison under `reports/`. `build` creates the master TSV and FASTA from already-fetched snapshots. `all` runs retrieval and the complete rebuild. Tests use only local fixtures:
 
 ```bash
 uv run --with pytest pytest
 ```
 
-Primary outputs are `data/master_effectors.tsv`, `data/all_effector_sequences.faa`, `data/source_comparison.tsv`, `data/fetch_failures.tsv`, and `reports/source_assessment.md`.
+The `data/` directory contains only the two primary deliverables: `master_effectors.tsv` and `all_effector_sequences.faa`. FASTA headers include the accession, canonical name, gene aliases, locus tag, full protein name, organism, taxonomy ID, review status, evidence category, sources, and available functional annotation. Source-comparison diagnostics live under `reports/`.
 
 ## Manual additions and exclusions
 
-Add a row to `data/manual_additions.tsv` using the master-table columns. Supply a stable accession when one exists, a sequence where possible, a provenance string in `source_record`, and do not use `experimentally_supported` without a literature reference in the provenance. Exact sequence hashes and UniProt accessions are used for deduplication; aliases and source provenance are merged.
+Add a row to `curation/manual_additions.tsv` using the master-table columns. Supply a stable accession when one exists, a sequence where possible, a provenance string in `source_record`, and do not use `experimentally_supported` without a literature reference in the provenance. Exact sequence hashes and UniProt accessions are used for deduplication; aliases and source provenance are merged.
 
-To suppress a record, add its accession (preferred) or canonical name to `data/manual_exclusions.tsv`, plus a reason and reference. Manual files are intentionally small and reviewable.
+To suppress a record, add its accession (preferred) or canonical name to `curation/manual_exclusions.tsv`, plus a reason and reference. Manual files are intentionally small and reviewable.
 
 ## Scheduled refresh
 

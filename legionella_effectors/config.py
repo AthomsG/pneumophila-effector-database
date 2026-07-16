@@ -4,6 +4,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 RAW = DATA / "raw"
 REPORTS = ROOT / "reports"
+CURATION = ROOT / "curation"
 
 UNIPROT_URL = "https://rest.uniprot.org/uniprotkb/search"
 PATHOGENS3D_URL = "https://proteins.pathogens3d.org/data/data.legionella-effectors.tsv"
@@ -25,7 +26,6 @@ QUERIES = {
 
 MASTER_FIELDS = (
     "uniprot_accession", "canonical_name", "gene_names", "locus_tag", "organism",
-    "strain", "taxonomy_id", "reviewed", "protein_name", "sequence", "sequence_length",
+    "strain", "taxonomy_id", "reviewed", "protein_name", "annotation", "sequence", "sequence_length",
     "evidence_category", "source", "source_record", "retrieval_date",
 )
-

@@ -32,6 +32,18 @@ def strain_from_organism(name):
     return match.group(1) if match else ""
 
 
+def _comment_annotation(record):
+    values = []
+    for comment in record.get("comments", []):
+        if comment.get("commentType") != "FUNCTION":
+            continue
+        for text in comment.get("texts", []):
+            value = " ".join(text.get("value", "").split())
+            if value and value not in values:
+                values.append(value)
+    return " ".join(values)
+
+
 def normalize_uniprot(record, retrieval_date):
     genes, locus = _genes(record)
     protein_name = _full_name(record)
@@ -48,6 +60,7 @@ def normalize_uniprot(record, retrieval_date):
         "taxonomy_id": record.get("organism", {}).get("taxonId", ""),
         "reviewed": str(record.get("entryType", "").startswith("UniProtKB reviewed")).lower(),
         "protein_name": protein_name,
+        "annotation": _comment_annotation(record),
         "sequence": sequence,
         "sequence_length": record.get("sequence", {}).get("length", len(sequence)),
         "evidence_category": "curated_annotation" if record.get("entryType", "").startswith("UniProtKB reviewed") else "automated_annotation",
@@ -64,4 +77,3 @@ def record_text(record):
         str(record.get("comments", [])),
         str(record.get("uniProtKBCrossReferences", [])),
     )).lower()
-

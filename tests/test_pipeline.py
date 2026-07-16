@@ -35,19 +35,22 @@ def test_exact_sequence_deduplication():
 
 
 def test_build_from_local_fixtures(monkeypatch, tmp_path):
-    data, raw, reports = tmp_path / "data", tmp_path / "data/raw", tmp_path / "reports"
+    data, raw, reports, curation = tmp_path / "data", tmp_path / "data/raw", tmp_path / "reports", tmp_path / "curation"
     raw.mkdir(parents=True)
+    curation.mkdir()
     records = json.loads((FIXTURES / "uniprot.json").read_text())
     for name in pipeline.QUERIES:
         (raw / f"uniprot_{name}.json").write_text(json.dumps(records))
     (raw / "uniprot_pathogens3d_accessions.json").write_text(json.dumps([records[0]]))
     (raw / "pathogens3d.tsv").write_text((FIXTURES / "pathogens3d.tsv").read_text())
-    (data / "manual_additions.tsv").write_text("\t".join(pipeline.MASTER_FIELDS) + "\n")
-    (data / "manual_exclusions.tsv").write_text("uniprot_accession\tcanonical_name\treason\treference\n")
+    (curation / "manual_additions.tsv").write_text("\t".join(pipeline.MASTER_FIELDS) + "\n")
+    (curation / "manual_exclusions.tsv").write_text("uniprot_accession\tcanonical_name\treason\treference\n")
     monkeypatch.setattr(pipeline, "DATA", data)
     monkeypatch.setattr(pipeline, "RAW", raw)
     monkeypatch.setattr(pipeline, "REPORTS", reports)
+    monkeypatch.setattr(pipeline, "CURATION", curation)
     rows = pipeline.build()
     assert [r["uniprot_accession"] for r in rows] == ["P00001"]
-    assert read_tsv(data / "source_comparison.tsv")[0]["comparison_status"] == "overlap"
+    assert read_tsv(reports / "source_comparison.tsv")[0]["comparison_status"] == "overlap"
     assert (data / "all_effector_sequences.faa").read_text().startswith(">P00001")
+    assert "gene=testA" in (data / "all_effector_sequences.faa").read_text().splitlines()[0]

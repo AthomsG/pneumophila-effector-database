@@ -11,17 +11,17 @@ Data retrieved on 2026-07-16.
 
 ## Coverage and overlap
 
-Pathogens3D contains **368** rows and **368** non-empty UniProt accessions. UniProt resolved **367** to active records; **1** accession(s) are inactive/deleted and appear in `data/fetch_failures.tsv`.
+Pathogens3D contains **368** rows and **368** non-empty UniProt accessions. UniProt resolved **367** to active records; **1** accession(s) are inactive/deleted and are noted in the transient fetch log.
 
 Across the exploratory queries, **69** accessions overlap Pathogens3D, **299** Pathogens3D accessions are not recovered by those queries, and **3403** UniProt query hits are absent from Pathogens3D.
 
-The complete, row-level result (including query provenance) is in `data/source_comparison.tsv`.
+The complete, row-level result (including query provenance) is in `reports/source_comparison.tsv`.
 
 ## Missing and additional records
 
-Pathogens3D-only accessions (299): `A0A077GS41`, `A0A3N9YH02`, `P37033`, `Q5ZR83`, `Q5ZR84`, `Q5ZRA8`, `Q5ZRD0`, `Q5ZRE6`, `Q5ZRH0`, `Q5ZRH1`, `Q5ZRJ3`, `Q5ZRJ6`, `Q5ZRJ7`, `Q5ZRK2`, `Q5ZRK7`, `Q5ZRL9`, `Q5ZRM1`, `Q5ZRN6`, `Q5ZRP8`, `Q5ZRQ2`, `Q5ZRQ4`, `Q5ZRR5`, `Q5ZRR7`, `Q5ZRS4`, `Q5ZRS6`, `Q5ZRW4`, `Q5ZRW7`, `Q5ZRX6`, `Q5ZS00`, `Q5ZS25`, … (269 more; see `data/source_comparison.tsv`).
+Pathogens3D-only accessions (299): `A0A077GS41`, `A0A3N9YH02`, `P37033`, `Q5ZR83`, `Q5ZR84`, `Q5ZRA8`, `Q5ZRD0`, `Q5ZRE6`, `Q5ZRH0`, `Q5ZRH1`, `Q5ZRJ3`, `Q5ZRJ6`, `Q5ZRJ7`, `Q5ZRK2`, `Q5ZRK7`, `Q5ZRL9`, `Q5ZRM1`, `Q5ZRN6`, `Q5ZRP8`, `Q5ZRQ2`, `Q5ZRQ4`, `Q5ZRR5`, `Q5ZRR7`, `Q5ZRS4`, `Q5ZRS6`, `Q5ZRW4`, `Q5ZRW7`, `Q5ZRX6`, `Q5ZS00`, `Q5ZS25`, … (269 more; see `reports/source_comparison.tsv`).
 
-UniProt-only effector-like records retained in the catalogue (940): `A0A078KRP0`, `A0A078KSH7`, `A0A078KT24`, `A0A078KTT6`, `A0A078KU50`, `A0A078KU91`, `A0A078KU98`, `A0A078KVA7`, `A0A078KVE2`, `A0A078KWF2`, `A0A078KWJ9`, `A0A078KXW4`, `A0A078KY31`, `A0A078KYW7`, `A0A078KZ92`, `A0A078L125`, `A0A078L477`, `A0A078L4W6`, `A0A078L595`, `A0A078L5S6`, `A0A078L5T4`, `A0A098FZC7`, `A0A098FZF3`, `A0A098G267`, `A0A098G2B2`, `A0A098G3L6`, `A0A098G4F0`, `A0A098G4M8`, `A0A098G4X0`, `A0A098G522`, … (910 more; see `data/source_comparison.tsv`).
+UniProt-only effector-like records retained in the catalogue (940): `A0A078KRP0`, `A0A078KSH7`, `A0A078KT24`, `A0A078KTT6`, `A0A078KU50`, `A0A078KU91`, `A0A078KU98`, `A0A078KVA7`, `A0A078KVE2`, `A0A078KWF2`, `A0A078KWJ9`, `A0A078KXW4`, `A0A078KY31`, `A0A078KYW7`, `A0A078KZ92`, `A0A078L125`, `A0A078L477`, `A0A078L4W6`, `A0A078L595`, `A0A078L5S6`, `A0A078L5T4`, `A0A098FZC7`, `A0A098FZF3`, `A0A098G267`, `A0A098G2B2`, `A0A098G3L6`, `A0A098G4F0`, `A0A098G4M8`, `A0A098G4X0`, `A0A098G522`, … (910 more; see `reports/source_comparison.tsv`).
 
 ## Ambiguity and false positives
 
