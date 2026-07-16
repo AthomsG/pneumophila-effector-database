@@ -1,0 +1,76 @@
+name: Refresh catalogue
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 1 * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e . pytest
+      - run: pytest
+      - name: Save current record fingerprint
+        run: |
+          python - <<'PY' > /tmp/master-before.sha256
+          import csv, hashlib, json
+          with open("data/master_effectors.tsv") as handle:
+              rows = list(csv.DictReader(handle, delimiter="\t"))
+          for row in rows:
+              row.pop("retrieval_date", None)
+          print(hashlib.sha256(json.dumps(rows, sort_keys=True).encode()).hexdigest())
+          PY
+      - name: Rebuild catalogue
+        run: python -m legionella_effectors all
+      - name: Detect record changes
+        id: records
+        run: |
+          python - <<'PY' > /tmp/master-after.sha256
+          import csv, hashlib, json
+          with open("data/master_effectors.tsv") as handle:
+              rows = list(csv.DictReader(handle, delimiter="\t"))
+          for row in rows:
+              row.pop("retrieval_date", None)
+          print(hashlib.sha256(json.dumps(rows, sort_keys=True).encode()).hexdigest())
+          PY
+          if cmp -s /tmp/master-before.sha256 /tmp/master-after.sha256; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Create change summary
+        if: steps.records.outputs.changed == 'true'
+        run: |
+          {
+            echo "## Catalogue refresh"
+            echo
+            echo '```text'
+            git diff --stat
+            echo '```'
+            echo
+            echo "Records: $(($(wc -l < data/master_effectors.tsv) - 1))"
+          } > change-summary.md
+      - uses: peter-evans/create-pull-request@v7
+        if: steps.records.outputs.changed == 'true'
+        with:
+          branch: automated/monthly-effector-refresh
+          delete-branch: true
+          commit-message: "data: refresh Legionella effector catalogue"
+          title: "Monthly Legionella effector catalogue refresh"
+          body-path: change-summary.md
+          labels: automated,data-refresh
+          add-paths: |
+            data/master_effectors.tsv
+            data/all_effector_sequences.faa
+            data/source_comparison.tsv
+            data/fetch_failures.tsv
+            reports/source_assessment.md

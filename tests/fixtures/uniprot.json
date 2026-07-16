@@ -1,0 +1,23 @@
+[
+  {
+    "primaryAccession": "P00001",
+    "entryType": "UniProtKB reviewed (Swiss-Prot)",
+    "proteinDescription": {"recommendedName": {"fullName": {"value": "Effector protein TestA"}}},
+    "genes": [{"geneName": {"value": "testA"}, "orderedLocusNames": [{"value": "lpg0001"}]}],
+    "organism": {"scientificName": "Legionella pneumophila (strain Test 1)", "taxonId": 123},
+    "sequence": {"value": "MPEPTIDE", "length": 8},
+    "comments": [],
+    "uniProtKBCrossReferences": []
+  },
+  {
+    "primaryAccession": "P00002",
+    "entryType": "UniProtKB unreviewed (TrEMBL)",
+    "proteinDescription": {"submissionNames": [{"fullName": {"value": "Type IV secretion system protein DotA"}}]},
+    "genes": [{"geneName": {"value": "dotA"}}],
+    "organism": {"scientificName": "Legionella testensis", "taxonId": 456},
+    "sequence": {"value": "MAPPARATUS", "length": 10},
+    "comments": [],
+    "uniProtKBCrossReferences": []
+  }
+]
+
