@@ -11,6 +11,8 @@ requires-python = ">=3.10"
 [project.scripts]
 legionella-effectors = "legionella_effectors.cli:main"
 
+[tool.setuptools.packages.find]
+include = ["legionella_effectors*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-

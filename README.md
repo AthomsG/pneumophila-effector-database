@@ -21,20 +21,19 @@ These categories are conservative. “Reviewed” means expert-curated, not nece
 
 ## Running the pipeline
 
-Python 3.10 or newer is sufficient; the runtime uses only the standard library.
+Python 3.10 or newer is sufficient; the runtime uses only the standard library. The examples use [uv](https://docs.astral.sh/uv/) for reproducible environment management.
 
 ```bash
-python -m legionella_effectors fetch
-python -m legionella_effectors compare
-python -m legionella_effectors build
-python -m legionella_effectors all
+uv run python -m legionella_effectors fetch
+uv run python -m legionella_effectors compare
+uv run python -m legionella_effectors build
+uv run python -m legionella_effectors all
 ```
 
 `fetch` writes raw source snapshots and records recoverable failures in `data/fetch_failures.tsv`. `compare` produces the row-level source comparison and report. `build` creates the master TSV and FASTA from already-fetched snapshots. `all` runs retrieval and the complete rebuild. Tests use only local fixtures:
 
 ```bash
-python -m pip install -e . pytest
-pytest
+uv run --with pytest pytest
 ```
 
 Primary outputs are `data/master_effectors.tsv`, `data/all_effector_sequences.faa`, `data/source_comparison.tsv`, `data/fetch_failures.tsv`, and `reports/source_assessment.md`.
@@ -52,4 +51,3 @@ The GitHub Actions workflow runs on the first day of each month and by manual di
 ## Limitations
 
 Text search is sensitive to annotation wording and can miss effectors described only as “uncharacterized protein.” Conversely, secretion-system queries retrieve machinery proteins that are not effectors. Gene names are reused across strains, automated annotations propagate by homology, and Pathogens3D is centred on structurally interpreted records rather than exhaustive strain coverage. The catalogue is therefore a transparent, reproducible starting point—not a claim of complete or uniformly experimental coverage.
-

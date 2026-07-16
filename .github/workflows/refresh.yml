@@ -14,14 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12"
-      - run: python -m pip install -e . pytest
-      - run: pytest
+      - run: uv run --with pytest pytest
       - name: Save current record fingerprint
         run: |
-          python - <<'PY' > /tmp/master-before.sha256
+          uv run python - <<'PY' > /tmp/master-before.sha256
           import csv, hashlib, json
           with open("data/master_effectors.tsv") as handle:
               rows = list(csv.DictReader(handle, delimiter="\t"))
@@ -30,11 +29,11 @@ jobs:
           print(hashlib.sha256(json.dumps(rows, sort_keys=True).encode()).hexdigest())
           PY
       - name: Rebuild catalogue
-        run: python -m legionella_effectors all
+        run: uv run python -m legionella_effectors all
       - name: Detect record changes
         id: records
         run: |
-          python - <<'PY' > /tmp/master-after.sha256
+          uv run python - <<'PY' > /tmp/master-after.sha256
           import csv, hashlib, json
           with open("data/master_effectors.tsv") as handle:
               rows = list(csv.DictReader(handle, delimiter="\t"))
