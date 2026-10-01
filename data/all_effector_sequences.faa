@@ -301,7 +301,7 @@ HGGPIAKQFHKDKNSEPLVNFVESTLSENQSVLKVSPFQNERIVEMLSEIDVVKSECSSP
 AVFDDLSWKLREMNCTLVKAKSIGDYTSKIFANLDTPYMEENTDEDPKPVLVEELQTDDV
 YQLHHSGMKLMRELEQAIEDHKPKVIYHCSGEANYGFFKEARRRGRHLSREPMDIEVMDM
 DVMDYDENDLRDQTVMITV
->Q5ZVF7 name=legK1 | gene=legK1;lpg1483;LegK1 | locus=lpg1483 | protein_name=Serine/threonine-protein kinase | organism=Legionella pneumophila subsp. pneumophila (strain Philadelphia 1 / ATCC 33152 / DSM 7513) | taxid=272624 | reviewed=false | evidence=experimentally_supported | evidence_reference=https://doi.org/10.1038/s44320-024-00076-z | source=UniProt;Pathogens3D | annotation=Pathogens3D: Serine/threonine protein kinase consisting of protein kinase domain followed by helical domain.
+>Q5ZVF7 name=legK1 | gene=legK1;lpg1483;LegK1 | locus=lpg1483 | protein_name=Serine/threonine-protein | organism=Legionella pneumophila subsp. pneumophila (strain Philadelphia 1 / ATCC 33152 / DSM 7513) | taxid=272624 | reviewed=false | evidence=experimentally_supported | evidence_reference=https://doi.org/10.1038/s44320-024-00076-z | source=UniProt;Pathogens3D | annotation=Pathogens3D: Serine/threonine protein kinase consisting of protein kinase domain followed by helical domain.
 MPRTMFFSVDAANLQNLQITNQKAFAALESYLNDNDSPGAWNNNQGYKYTHKDVTYCFSF
 NQSLVRRPRKSDQKKHTFEIFDPNKNPLGKGAYGIVYPILGTIQFEFGNAIKRPPKNKLV
 KIQNHSERDQSHSVLREYQGLLQSGHIAVKPPIFVENKESKFSYLIMEKAEGIVLEKFLN
@@ -1118,7 +1118,7 @@ MLPFKYRYMSGADIMTWSSSEQLEEEYLNARREYCMTMMAVHDKARALLSETPIDENMKQ
 AIIKSSGVKIRPNETQDEFDERFEDEMGLTIDDYVDFALDVLEKKLEPAKQSIVAAANKE
 LGSLTSGQSGSAWEDFQHTIHEGAEYKTIEVAKCLPESERCIQAFNQAKLAFRDAATNLI
 HAEKLDEPEEPNHGPRF
->Q5ZWW6 name=lpg0968 | gene=lpg0968 | locus=lpg0968 | protein_name=Uncharacterized protein | organism=Legionella pneumophila subsp. pneumophila (strain Philadelphia 1 / ATCC 33152 / DSM 7513) | taxid=272624 | reviewed=false | evidence=experimentally_supported | evidence_reference=https://doi.org/10.1038/s44320-024-00076-z | source=UniProt;Pathogens3D | annotation=Pathogens3D: SidK effector that inhibits host's V-ATPase {PMID: 28570695}{PDB: 5uf5}. SidK domain followed by helical region.
+>Q5ZWW6 name=lpg0968 | gene=lpg0968 | locus=lpg0968 | protein_name=Type IV secretion protein Dot | organism=Legionella pneumophila subsp. pneumophila (strain Philadelphia 1 / ATCC 33152 / DSM 7513) | taxid=272624 | reviewed=false | evidence=experimentally_supported | evidence_reference=https://doi.org/10.1038/s44320-024-00076-z | source=UniProt;Pathogens3D | annotation=Pathogens3D: SidK effector that inhibits host's V-ATPase {PMID: 28570695}{PDB: 5uf5}. SidK domain followed by helical region.
 MSFIKVGIKMGGLTSEQYHSQVVGKIGYIARCMQTIDPENNLKKIREDYQDVLIWAEKNY
 RFEEILEASKSGKCPNDLDALSRRSLILQELLRLVSSISPFKMKLDLIESQYEKMKQHVN
 LWKSDYHVKLNQLNQLTDYLKNAAPTPKNNFLRAMTSVLQMQIAQYGITEDNEGINQLFK
@@ -1581,7 +1581,7 @@ DFYAVFNPSHKRLGVAEDLGLPVPEFDSFLGLYYPYWDNFGRWYHIVYPTRENKFRQGLA
 SAPYDYPIVLVNNSQYWGVGNYKSHTAIPADNSTYFTYILIHELGHFFGLNEEYEGGGRT
 ELEFAPEMKEPWSQNITFLTTPSYSGLKWNELVNPQMSIPTPYSDWQSTPPQYGAYRGGY
 GDSPSHQGASHKPGLNCIMESHASFCDICQKGIMDVIRFDLGT
->Q5ZUX2 name=lpg1670 | gene=lpg1670 | locus=lpg1670 | protein_name=Uncharacterized protein | organism=Legionella pneumophila subsp. pneumophila (strain Philadelphia 1 / ATCC 33152 / DSM 7513) | taxid=272624 | reviewed=false | evidence=experimentally_supported | evidence_reference=https://doi.org/10.1038/s44320-024-00076-z | source=UniProt;Pathogens3D | annotation=Pathogens3D: Alpha superhelix protein homologous to metaeffector MesI (lpg2505) and lpg1685. Structurally characterized {PDB: 5t2x}
+>Q5ZUX2 name=lpg1670 | gene=lpg1670 | locus=lpg1670 | protein_name=Ankyrin repeat protein | organism=Legionella pneumophila subsp. pneumophila (strain Philadelphia 1 / ATCC 33152 / DSM 7513) | taxid=272624 | reviewed=false | evidence=experimentally_supported | evidence_reference=https://doi.org/10.1038/s44320-024-00076-z | source=UniProt;Pathogens3D | annotation=Pathogens3D: Alpha superhelix protein homologous to metaeffector MesI (lpg2505) and lpg1685. Structurally characterized {PDB: 5t2x}
 MGSSYNDWLKSSYSELKKINIIENLIKENNFARAKMLLNNLDLTTLIKYTELSKTITDFC
 EEAEQADIWRTHLQNFNEEHFSFEEYPPLTVSQLVKGIYFYGQAAECREEEGKPFGDNEL
 EFLKKSAYQHCFYAYNSLSTWAYEKYKMGLNDYSLLTLHYAQKACQYHWTPGYLLFYKTC
@@ -2969,7 +2969,7 @@ MTRFIMLSFVTGYRKSISCNRFSRNVVSPYFFMRTIIMTRFERNFLINSLMFLETILSVD
 KKLDDAIHHFTQGQYENPRYQINSRITNADDWSKEDKLKFTSAIAEAIALVSEKYENPTS
 ETTEQIQSARNILLDNYVPLLTANTDPENRLKSVRENSSQIRKELIAKLKDEVPYKSQFE
 NPYVLFPFVAATVAVAATAASVLFGNKP
->Q5ZZ03 name=pkn5 | gene=pkn5;lpg0208 | locus=lpg0208 | protein_name=Serine/threonine-protein kinase | organism=Legionella pneumophila subsp. pneumophila (strain Philadelphia 1 / ATCC 33152 / DSM 7513) | taxid=272624 | reviewed=false | evidence=experimentally_supported | evidence_reference=https://doi.org/10.1038/s44320-024-00076-z | source=UniProt;Pathogens3D | annotation=Pathogens3D: LegK4 effector - AMPPNP dimeric eukaryotic-like kinase{PMID: 26419332} with C-terminal ARM repeat. Structurally characterized {PDB:5clr}
+>Q5ZZ03 name=pkn5 | gene=pkn5;lpg0208 | locus=lpg0208 | protein_name=Serine/threonine-protein | organism=Legionella pneumophila subsp. pneumophila (strain Philadelphia 1 / ATCC 33152 / DSM 7513) | taxid=272624 | reviewed=false | evidence=experimentally_supported | evidence_reference=https://doi.org/10.1038/s44320-024-00076-z | source=UniProt;Pathogens3D | annotation=Pathogens3D: LegK4 effector - AMPPNP dimeric eukaryotic-like kinase{PMID: 26419332} with C-terminal ARM repeat. Structurally characterized {PDB:5clr}
 MCNHSLNEPHLGSSYLACESMFGSYYFALYFALNFFLMIVFYNAKVIFIQVCKYVRFLMK
 LLRFHELKSLPSMDEKALELLIKVLGNKGIRKLIKSADGKPISREIMIHEFGIDCQILFI
 TTEASLKPIIVPTENKISGGGKSYCEQFKVYALDDGKTYFLKSVKINAESLTEFTNETDT
